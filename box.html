@@ -1,0 +1,251 @@
+
+<div class="box-wrapper">
+    <div class="box {{box.BoxType}}" ng-repeat="box in boxes track by $index" 
+            id="{{ box.MessageId }}"
+            data-box-index="{{$index}}" 
+            data-message-id="{{ box.MessageId }}" 
+            data-message-datetime="{{ box.MessageDatetime }}" 
+            data-box-type="{{ box.BoxType }}" 
+            data-like-count="{{ box.LikeCount }}" 
+            data-comment-count="{{ box.CommentCount }}" 
+            data-offer-count="{{ box.OfferCount }}" 
+            data-you-liked-this-post="{{ box.YouLikedThisPost }}" 
+            data-notification-external-id="{{ box.NotificationExternalId }}" 
+            data-is-notification-read="{{ box.IsNotificationRead }}" 
+            data-notification-external-message-id="{{ box.NotificationExternalMessageId }}" 
+            data-notification-type="{{ box.NotificationType }}" 
+            data-market-place-offer-id="{{ box.MarketPlaceOfferId }}" 
+            data-posted-by-external-id="{{ box.PostedByExternalId }}" 
+            data-display-time="{{ box.DisplayTime }}"
+            ng-attr-style="background-color:{{ box.BackgroundColor }};">
+        
+        <div class="box-item {{ boxItem.Type }}_Wrapper" ng-repeat="boxItem in box.BoxItems">
+            
+            <!-- Split -->
+            <div class="split" ng-if="boxItem.Type == 'Split'">
+                <div class="split-left" ng-attr-style="width: {{boxItem.LeftSidePrecentage}}%;">
+                    <div class="box-item {{ boxItem.Type }}_Wrapper" ng-repeat="boxItem in boxItem.LeftBox.BoxItems">
+                    
+                        <!-- Text -->                  
+                        <div class="text" ng-class="{'box-item-img text-item-img': boxItem.BackgroundImage != null}" ng-if="boxItem.Type == 'Text' && boxItem.Content != ''" ng-attr-style="{{textItemStyle(boxItem)}}">    
+                            {{ outputText(boxItem, box) }}    
+                        </div>
+                        
+                        <!-- PostedBy -->
+                        <div class="postedby" ng-class="{'box-item-img postedby-item-img': boxItem.BackgroundImage != null}" ng-if="boxItem.Type == 'PostedBy'" ng-attr-style="{{postedByItemStyle(boxItem)}}">    
+                            <div class="postedby-info">
+                                <div class="postedby-img" ng-attr-style="{{postedByItemImgStyle(boxItem)}}"></div>
+                                <div class="postedby-desc">
+                                    <div class="postedby-text" ng-attr-style="{{postedByItemTextStyle(boxItem)}}">{{ boxItem.Name }}</div>                
+                                    <div class="postedby-datetime">{{timeAgo(box.MessageDatetime)}}</div>                        
+                                </div> 
+                                <ul class="dropdown-menu" ng-if="boxItem.ActionButtons.length > 0">
+                                    <li class="has-children">
+                                        <a href="javascript:void(0)"><span class="icon-down-open-big"></span></a>
+                                        <ul>
+                                            <li class="action-button {{ actionButton.Type }}" ng-repeat="actionButton in boxItem.ActionButtons" ng-attr-style="float: {{ actionButton.Float }};">
+                                                
+                                                <a class="{{ actionButton.Type }}" 
+                                                        data-file-to-download="{{ actionButton.FileToDownload }}" 
+                                                        data-share-text="{{ actionButton.ShareText }}" 
+                                                        data-share-url="{{ actionButton.ShareUrl }}" 
+                                                        data-share-image="{{ actionButton.ShareImage }}" 
+                                                        data-calendar-title="{{ actionButton.CalendarTitle }}" 
+                                                        data-calendar-notes="{{ actionButton.CalendarNotes }}" 
+                                                        data-calendar-event-start-date="{{ actionButton.CalendarEventStartDate }}" 
+                                                        data-calendar-event-end-date="{{ actionButton.CalendarEventEndDate }}">
+                                                    <span class="action-icon icon-{{actionButton.Type}}" ng-if="actionButton.Type == 'EditPost'"><span>Edit Post</span></span>
+                                                    <span class="action-icon icon-{{actionButton.Type}}" ng-if="actionButton.Type == 'DeletePost'"><span>Delete Post</span></span>
+                                                    <span class="action-icon vm-icon-{{actionButton.Type}}" ng-if="actionButton.Type == 'MarkAsInappropriate'"><span>Mark as inappropriate</span></span>
+                                                    <span class="action-icon vm-icon-{{actionButton.Type}}" ng-if="actionButton.Type == 'ReportAsInappropriate'"><span>Report as inappropriate</span></span>
+                                                    <span class="action-icon icon-{{actionButton.Type}}" ng-if="actionButton.Type == 'AddToMyCalendar'"><span>Add to my calendar</span></span>
+                                                    <span class="action-icon icon-{{actionButton.Type}}" ng-if="actionButton.Type == 'Donors'"><span>Donors</span></span>
+                                                    <span class="action-icon icon-{{actionButton.Type}}" ng-if="actionButton.Type == 'Share'"><span>Share</span></span>
+                                                    
+                                                    <p class="action-button-desc" ng-if="actionButton.Description != '' && actionButton.Description != null">{{ actionButton.Description }}</p>
+                                                </a>
+                                                
+                                            </li>                                        
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="postedby-play" ng-if="boxItem.VoiceCommandUrl != null">
+                                <span class="postedby-icon icon-mic"></span>
+                                <a ng-href="{{boxItem.VoiceCommandUrl}}" class="sm2_button"><span class="icon-play"></span><label>Play voice message</label></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="split-right" ng-attr-style="width: {{boxItem.RightSidePrecentage}}%;">
+                    <div class="box-item {{ rightBoxItem.Type }}_Wrapper" ng-repeat="rightBoxItem in boxItem.RightBox.BoxItems">
+                        <!-- PictureText -->
+                        <div class="picturetext" ng-class="{'box-item-img picturetext-item-img': rightBoxItem.BackgroundImage != null}" ng-if="rightBoxItem.Type == 'PictureText'" ng-attr-style="{{pictureTextItemStyle(rightBoxItem)}}">
+                            <p class="picturetext-text" ng-attr-style="{{pictureTextTextStyle(rightBoxItem)}}" ng-if="rightBoxItem.Text != null && (rightBoxItem.ImagePosition == 'bottom-left' || rightBoxItem.ImagePosition == 'bottom-center' || rightBoxItem.ImagePosition == 'bottom-right')">{{ rightBoxItem.Text }}</p>
+                            <div class="picturetext-img" ng-attr-style="{{pictureTextImgWrapperStyle(rightBoxItem, box.MessageId)}}">
+                                <img ng-src="{{ rightBoxItem.Image }}" ng-attr-style="{{pictureTextImgStyle(rightBoxItem, box.MessageId, boxItem.RightSidePrecentage)}}"/>
+                            </div>
+                            <p class="picturetext-text" ng-attr-style="{{pictureTextTextStyle(rightBoxItem)}}" ng-if="rightBoxItem.Text != null && rightBoxItem.ImagePosition != 'bottom-left' && rightBoxItem.ImagePosition != 'bottom-center' && rightBoxItem.ImagePosition != 'bottom-right'">{{ rightBoxItem.Text }}</p>
+                        </div>    
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ActionBar -->
+            <div class="action-bar" ng-if="boxItem.Type == 'ActionBar'">    
+                <div class="action-button {{ actionButton.Type }}" ng-class="{'post-liked': box.YouLikedThisPost == true && actionButton.Type == 'Like'}" ng-repeat="actionButton in boxItem.ActionButtons" ng-attr-style="float: {{ actionButton.Float }};">
+                    <a ng-click="actionButtonClicked(actionButton.Type, box)" class="{{ actionButton.Type }}" ng-if="actionButton.Icon != null && actionButton.Icon != ''"
+                            data-file-to-download="{{ actionButton.FileToDownload }}" 
+                            data-share-text="{{ actionButton.ShareText }}" 
+                            data-share-url="{{ actionButton.ShareUrl }}" 
+                            data-share-image="{{ actionButton.ShareImage }}" 
+                            data-calendar-title="{{ actionButton.CalendarTitle }}" 
+                            data-calendar-notes="{{ actionButton.CalendarNotes }}" 
+                            data-calendar-event-start-date="{{ actionButton.CalendarEventStartDate }}" 
+                            data-calendar-event-end-date="{{ actionButton.CalendarEventEndDate }}">
+                        <img ng-src="{{ actionButton.Icon }}"/>
+                    </a>
+                    <a ng-click="actionButtonClicked(actionButton.Type, box)" class="{{ actionButton.Type }}" ng-if="actionButton.Icon == null || actionButton.Icon == ''"
+                            data-file-to-download="{{ actionButton.FileToDownload }}" 
+                            data-share-text="{{ actionButton.ShareText }}" 
+                            data-share-url="{{ actionButton.ShareUrl }}" 
+                            data-share-image="{{ actionButton.ShareImage }}" 
+                            data-calendar-title="{{ actionButton.CalendarTitle }}" 
+                            data-calendar-notes="{{ actionButton.CalendarNotes }}" 
+                            data-calendar-event-start-date="{{ actionButton.CalendarEventStartDate }}" 
+                            data-calendar-event-end-date="{{ actionButton.CalendarEventEndDate }}">
+                    
+                        <span class="action-bar-icon icon-{{actionButton.Type}}" ng-switch="actionButton.Type">
+                            <span ng-switch-when="SharedWith">Shared With</span>
+                            <span ng-switch-when="AddToMyCalendar">Add to my calendar</span>
+                            <span ng-switch-when="MakeAnOffer">Make an offer</span>                            
+                            <span ng-switch-when="PrivateMessage">Private message</span>
+                            <span ng-switch-default>{{ actionButton.Type }}</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Text -->                  
+            <div ng-bind-html="outputText(boxItem, box) | trustAsHtml" class="text" ng-class="{'box-item-img text-item-img': boxItem.BackgroundImage != null}" ng-if="boxItem.Type == 'Text' && boxItem.Content != ''" ng-attr-style="{{textItemStyle(boxItem)}}">
+                
+            </div>
+            
+            <!-- TextButton -->                  
+            <div class="textbutton" ng-class="{'box-item-img textbutton-item-img': boxItem.BackgroundImage != null}" ng-if="boxItem.Type == 'TextButton'" ng-attr-style="{{textButtonItemStyle(boxItem)}}">
+                <div class="text-button" ng-attr-style="{{textButtonWrapperStyle(boxItem, box.MessageId)}}">
+                    <a ng-click="textButtonClicked(boxItem.ButtonAction, box)" class="button {{boxItem.ButtonAction}}" ng-attr-style="{{textButtonStyle(boxItem)}}">{{boxItem.ButtonText}}</a>
+                </div>
+                <p class="note">{{boxItem.Notes}}</p>
+            </div>
+            
+            <!-- PostedBy -->
+            <div class="postedby" ng-class="{'box-item-img postedby-item-img': boxItem.BackgroundImage != null}" ng-if="boxItem.Type == 'PostedBy'" ng-attr-style="{{postedByItemStyle(boxItem)}}">    
+                <div class="postedby-info">
+                    <div class="postedby-img" ng-attr-style="{{postedByItemImgStyle(boxItem)}}"></div>
+                    <div class="postedby-desc">
+                        <div class="postedby-text" ng-attr-style="{{postedByItemTextStyle(boxItem)}}">{{ boxItem.Name }}</div>                
+                        <div class="postedby-datetime">{{timeAgo(box.MessageDatetime)}}</div>                        
+                    </div> 
+                    <ul class="dropdown-menu" ng-if="boxItem.ActionButtons.length > 0">
+                        <li class="has-children">
+                            <a href="javascript:void(0)"><span class="icon-down-open-big" ng-if="boxItem.ActionButtons.length > 0"></span></a>
+                            <ul>
+                                <li class="action-button {{ actionButton.Type }}" ng-repeat="actionButton in boxItem.ActionButtons" ng-attr-style="float: {{ actionButton.Float }};">
+                                    
+                                    <a ng-click="actionButtonClicked(actionButton.Type, box)" class="{{ actionButton.Type }}" 
+                                            data-file-to-download="{{ actionButton.FileToDownload }}" 
+                                            data-share-text="{{ actionButton.ShareText }}" 
+                                            data-share-url="{{ actionButton.ShareUrl }}" 
+                                            data-share-image="{{ actionButton.ShareImage }}" 
+                                            data-calendar-title="{{ actionButton.CalendarTitle }}" 
+                                            data-calendar-notes="{{ actionButton.CalendarNotes }}" 
+                                            data-calendar-event-start-date="{{ actionButton.CalendarEventStartDate }}" 
+                                            data-calendar-event-end-date="{{ actionButton.CalendarEventEndDate }}">
+                                        <span class="action-icon icon-{{actionButton.Type}}" ng-if="actionButton.Type == 'EditPost'"><span>Edit Post</span></span>
+                                        <span class="action-icon icon-{{actionButton.Type}}" ng-if="actionButton.Type == 'DeletePost'"><span>Delete Post</span></span>
+                                        <span class="action-icon vm-icon-{{actionButton.Type}}" ng-if="actionButton.Type == 'MarkAsInappropriate'"><span>Mark as inappropriate</span></span>
+                                        <span class="action-icon vm-icon-{{actionButton.Type}}" ng-if="actionButton.Type == 'ReportAsInappropriate'"><span>Report as inappropriate</span></span>
+                                        
+                                        <p class="action-button-desc" ng-if="actionButton.Description != '' && actionButton.Description != null">{{ actionButton.Description }}</p>
+                                    </a>
+                                    
+                                </li>                                        
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="postedby-play" ng-if="boxItem.VoiceCommandUrl != null">
+                    <span class="postedby-icon icon-mic"></span>
+                    <a ng-href="{{boxItem.VoiceCommandUrl}}" class="sm2_button"><span class="icon-play"></span><label>Play voice message</label></a>
+                </div>
+                
+                                
+            </div>
+            
+            <!-- Stamp -->                 
+            <div class="stamp" ng-class="{'box-item-img stamp-item-img': boxItem.BackgroundImage != null}" ng-if="boxItem.Type == 'Stamp'" ng-attr-style="{{stampItemStyle(boxItem)}}">     
+                <img ng-src="{{ boxItem.Image }}" ng-attr-style="{{stampItemImgStyle(boxItem, box.MessageId)}}"/>
+            </div>
+            
+            <!-- PictureText -->
+            <div class="picturetext" ng-class="{'box-item-img picturetext-item-img': boxItem.BackgroundImage != null}" ng-if="boxItem.Type == 'PictureText'" ng-attr-style="{{pictureTextItemStyle(boxItem)}}">
+                <p class="picturetext-text" ng-attr-style="{{pictureTextTextStyle(boxItem)}}" ng-if="boxItem.ImagePosition == 'bottom-left' || boxItem.ImagePosition == 'bottom-center' || boxItem.ImagePosition == 'bottom-right'">{{ boxItem.Text }}</p>
+                <div class="picturetext-img" ng-attr-style="{{pictureTextImgWrapperStyle(boxItem, box.MessageId)}}"><img ng-src="{{ boxItem.Image }}" ng-attr-style="{{pictureTextImgStyle(boxItem, box.MessageId)}}"/></div>
+                <p class="picturetext-text" ng-attr-style="{{pictureTextTextStyle(boxItem)}}" ng-if="boxItem.ImagePosition != 'bottom-left' && boxItem.ImagePosition != 'bottom-center' && boxItem.ImagePosition != 'bottom-right'">{{ boxItem.Text }}</p>
+            </div>
+            
+            <!-- File -->
+            <div class="file" data-file-url="{{ boxItem.FileUrl }}" data-file-type="{{ boxItem.FileType }}" ng-if="boxItem.Type == 'File'">   
+                <div class="file-info">
+                    <div class="file-desc" ng-if="boxItem.ImagePosition == 'bottom-left' || boxItem.ImagePosition == 'bottom-center' || boxItem.ImagePosition == 'bottom-right'">
+                        <p class="file-header-text" ng-attr-style="{{fileItemTextStyle(boxItem)}}">{{boxItem.HeaderText}}</p>
+                        <p class="file-desc-text" ng-attr-style="{{fileItemDescTextStyle(boxItem)}}">{{boxItem.DescriptionText}}</p>
+                    </div>
+                    <div class="file-img" ng-attr-style="{{fileImgWrapperStyle(boxItem, box.MessageId)}}"><img ng-src="{{boxItem.Image}}" ng-attr-style="{{fileItemImgStyle(boxItem, box.MessageId)}}"/></div>
+                    <div class="file-desc" ng-if="boxItem.ImagePosition != 'bottom-left' && boxItem.ImagePosition != 'bottom-center' && boxItem.ImagePosition != 'bottom-right'">
+                        <p class="file-header-text" ng-attr-style="{{fileItemTextStyle(boxItem)}}">{{boxItem.HeaderText}}</p>
+                        <p class="file-desc-text" ng-attr-style="{{fileItemDescTextStyle(boxItem)}}">{{boxItem.DescriptionText}}</p>
+                    </div>
+                </div>                   
+            </div>
+            
+            <!-- Folder -->
+            <div class="folder" data-folder-external-id="{{ boxItem.FolderExternalId }}" ng-if="boxItem.Type == 'Folder'">   
+                <div class="folder-info">
+                    <div class="folder-desc" ng-if="boxItem.ImagePosition == 'bottom-left' || boxItem.ImagePosition == 'bottom-center' || boxItem.ImagePosition == 'bottom-right'">
+                        <p class="folder-header-text" ng-attr-style="{{folderItemTextStyle(boxItem)}}">{{boxItem.HeaderText}}</p>
+                        <p class="folder-desc-text" ng-attr-style="{{folderItemDescTextStyle(boxItem)}}">{{boxItem.DescriptionText}}</p>
+                    </div>
+                    <div class="folder-img" ng-attr-style="{{folderImgWrapperStyle(boxItem, box.MessageId)}}"><img ng-src="{{boxItem.Image}}" ng-attr-style="{{folderItemImgStyle(boxItem, box.MessageId)}}"/></div>
+                    <div class="folder-desc" ng-if="boxItem.ImagePosition != 'bottom-left' && boxItem.ImagePosition != 'bottom-center' && boxItem.ImagePosition != 'bottom-right'">
+                        <p class="folder-header-text" ng-attr-style="{{folderItemTextStyle(boxItem)}}">{{boxItem.HeaderText}}</p>
+                        <p class="folder-desc-text" ng-attr-style="{{folderItemDescTextStyle(boxItem)}}">{{boxItem.DescriptionText}}</p>
+                    </div>
+                </div>                   
+            </div>
+                         
+            <!-- ImageSlider -->
+            <div class="imgslider" ng-if="boxItem.Type == 'ImageSlider' && boxItem.SliderItems.length > 0">
+                <div class="slider" id="{{box.MessageId}}_slider">
+                    <div class="slide" ng-repeat="sliderItem in boxItem.SliderItems">
+                        <a class="img-slider"><img ng-src="{{ sliderItem.MediumQualityImageUrl }}" data-src-2x="{{ sliderItem.HiQualityImageUrl }}" ng-if="sliderItem.ImageType == 'image'"/></a>
+                        <video ng-src="{{ sliderItem.HiQualityImageUrl | trustUrl }}" width="500" height="350" controls="controls" ng-if="sliderItem.ImageType == 'video'">
+                            <p>Your browser does not support the video tag.</p>
+                        </video>
+                    </div>
+                </div>
+                <div class="navslide" ng-if="boxItem.SliderItems.length > 1">                    
+                    <span class="next icon-right-open-big"></span>
+                    <span class="prev icon-left-open-big"></span>
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+        
+</div>
+
+
+
